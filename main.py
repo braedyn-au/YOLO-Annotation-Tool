@@ -19,7 +19,7 @@ COLORS = ['red', 'blue', 'yellow', 'pink', 'cyan', 'green', 'black']
 # image sizes for the examples
 SIZE = 256, 256
 
-class LabelTool():
+class LabelTool:
     def __init__(self, master):
         # set up the main frame
         self.parent = master
@@ -118,57 +118,6 @@ class LabelTool():
         # for debugging
 ##        self.setImage()
 ##        self.loadDir()
-
-    def loadDir(self, dbg = False):
-        if not dbg:
-            s = self.entry.get()
-            self.parent.focus()
-            self.category = int(s)
-        else:
-            s = './Images/003/'
-##        if not os.path.isdir(s):
-##            tkMessageBox.showerror("Error!", message = "The specified dir doesn't exist!")
-##            return
-        # get image list
-        print(self.category)
-        self.imageDir = os.path.join(r'./Images', '%03d' %(self.category))
-        print(self.imageDir)
-        self.imageList = glob.glob(os.path.join(self.imageDir, '*.jpg'))
-        if len(self.imageList) == 0:
-            print 'No .jpg images found in the specified dir!'
-            return
-
-        # default to the 1st image in the collection
-        self.cur = 1
-        self.total = len(self.imageList)
-
-         # set up output dir
-        self.outDir = os.path.join(r'./Labels', '%03d' %(self.category))
-        if not os.path.exists(self.outDir):
-            os.mkdir(self.outDir)
-
-        # load example bboxes
-        self.egDir = os.path.join(r'./Examples', '001')
-        #self.egDir = os.path.join(r'./Examples', '%03d' %(self.category))
-        if not os.path.exists(self.egDir):
-            return
-        filelist = glob.glob(os.path.join(self.egDir, '*.jpg'))
-        self.tmp = []
-        self.egList = []
-        random.shuffle(filelist)
-        for (i, f) in enumerate(filelist):
-            if i == 3:
-                break
-            im = Image.open(f)
-            r = min(SIZE[0] / im.size[0], SIZE[1] / im.size[1])
-            new_size = int(r * im.size[0]), int(r * im.size[1])
-            self.tmp.append(im.resize(new_size, Image.ANTIALIAS))
-            self.egList.append(ImageTk.PhotoImage(self.tmp[-1]))
-            self.egLabels[i].config(image = self.egList[-1], width = SIZE[0], height = SIZE[1])
-
-        self.loadImage()
-        print '%d images loaded from %s' %(self.total, s)
-
     def loadImage(self):
         # load image
         imagepath = self.imageList[self.cur - 1]
@@ -191,7 +140,7 @@ class LabelTool():
                         bbox_cnt = int(line.strip())
                         continue
                     tmp = [int(t.strip()) for t in line.split()]
-##                    print tmp
+    ##                    print tmp
                     self.bboxList.append(tuple(tmp))
                     tmpId = self.mainPanel.create_rectangle(tmp[0], tmp[1], \
                                                             tmp[2], tmp[3], \
@@ -207,8 +156,7 @@ class LabelTool():
             print(len(self.bboxList))
             for bbox in self.bboxList:
                 f.write(' '.join(map(str, bbox)) + '\n')
-        print 'Image No. %d saved' %(self.cur)
-
+        print('Image No. %d saved' %(self.cur))
 
     def mouseClick(self, event):
         if self.STATE['click'] == 0:
@@ -282,6 +230,57 @@ class LabelTool():
             self.saveImage()
             self.cur = idx
             self.loadImage()
+
+    def loadDir(self, dbg = False):
+        if not dbg:
+            s = self.entry.get()
+            self.parent.focus()
+            self.category = int(s)
+        else:
+            s = './Images/003/'
+#            if not os.path.isdir(s):
+#            tkMessageBox.showerror("Error!", message = "The specified dir doesn't exist!")
+#            return
+        # get image list
+        print(self.category)
+        self.imageDir = os.path.join(r'./Images', '%03d' %(self.category))
+        print(self.imageDir)
+        self.imageList = glob.glob(os.path.join(self.imageDir, '*.jpg'))
+        if len(self.imageList) == 0:
+            print('No .jpg images found in the specified dir!')
+            return
+
+        # default to the 1st image in the collection
+        self.cur = 1
+        self.total = len(self.imageList)
+
+         # set up output dir
+        self.outDir = os.path.join(r'./Labels', '%03d' %(self.category))
+        if not os.path.exists(self.outDir):
+            os.mkdir(self.outDir)
+
+        # load example bboxes
+        self.egDir = os.path.join(r'./Examples', '001')
+        #self.egDir = os.path.join(r'./Examples', '%03d' %(self.category))
+        if not os.path.exists(self.egDir):
+            return
+        filelist = glob.glob(os.path.join(self.egDir, '*.jpg'))
+        self.tmp = []
+        self.egList = []
+        random.shuffle(filelist)
+        for (i, f) in enumerate(filelist):
+            if i == 3:
+                break
+            im = Image.open(f)
+            r = min(SIZE[0] / im.size[0], SIZE[1] / im.size[1])
+            new_size = int(r * im.size[0]), int(r * im.size[1])
+            self.tmp.append(im.resize(new_size, Image.ANTIALIAS))
+            self.egList.append(ImageTk.PhotoImage(self.tmp[-1]))
+            self.egLabels[i].config(image = self.egList[-1], width = SIZE[0], height = SIZE[1])
+
+        self.loadImage()
+        print('%d images loaded from %s' %(self.total, s))
+    
 
 ##    def setImage(self, imagepath = r'test2.png'):
 ##        self.img = Image.open(imagepath)
